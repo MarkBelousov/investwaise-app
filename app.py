@@ -71,7 +71,7 @@ def main():
         # Investment parameters
         monthly_investment = st.number_input(
             "Monthly Investment Amount ($)",
-            min_value=0,
+            min_value=50,
             max_value=50000,
             value=1000,
             step=50,
@@ -155,7 +155,7 @@ def main():
                 st.success("Personalized recommendations generated based on your goals!")
     
     # Main content tabs
-    tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🔍 Stock Search", "🎯 Recommendations"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "🔍 Stock Search", "🎯 Recommendations", "💵 Return Simulator"])
     
     with tab1:
         if st.session_state.recommendations:
@@ -171,6 +171,9 @@ def main():
             display_detailed_recommendations()
         else:
             st.info("Please complete your investment profile and generate recommendations first.")
+    
+    with tab4:
+        display_return_simulator()
 
 def display_welcome_screen():
     """Display welcome screen with market overview"""
@@ -974,6 +977,131 @@ def create_goal_based_portfolio(user_inputs, stocks):
             'Bonds': base_allocation['bonds'],
             'Cash': base_allocation['cash']
         }
+
+def display_return_simulator():
+    """Display the return simulator for monthly return expectations and custom stock selection"""
+    st.markdown("### 💵 Return Simulator")
+    
+    # User input for simulation
+    with st.form("return_sim_form"):
+        initial_investment = st.number_input(
+            "Initial Investment ($)",
+            min_value=0,
+            max_value=1_000_000,
+            value=st.session_state.user_inputs.get('initial_investment', 5000),
+            step=100
+        )
+        monthly_contribution = st.number_input(
+            "Monthly Contribution ($)",
+            min_value=0,
+            max_value=50_000,
+            value=st.session_state.user_inputs.get('monthly_investment', 1000),
+            step=50
+        )
+        horizon_years = st.slider(
+            "Investment Horizon (years)",
+            min_value=1,
+            max_value=30,
+            value=5
+        )
+        default_annual_return = 0.07  # 7% typical market return
+        expected_annual_return = st.number_input(
+            "Expected Annual Return (%)",
+            min_value=0.0,
+            max_value=20.0,
+            value=7.0,
+            step=0.1,
+            help="Estimate based on market or your selected stocks"
+        )
+        submitted = st.form_submit_button("Simulate")
+    
+    if submitted:
+        # Calculate projection
+        months = horizon_years * 12
+        r = (expected_annual_return / 100) / 12
+        future_value = initial_investment * (1 + r) ** months + monthly_contribution * (((1 + r) ** months - 1) / r)
+        total_invested = initial_investment + monthly_contribution * months
+        total_gain = future_value - total_invested
+        avg_monthly_return = total_gain / months if months > 0 else 0
+        
+        st.markdown(f"#### 📈 Projected Portfolio Value: **${future_value:,.2f}**")
+        st.markdown(f"#### 💰 Expected Average Monthly Return: **${avg_monthly_return:,.2f}**")
+        
+        # Show growth chart
+        values = []
+        val = initial_investment
+        for m in range(1, months + 1):
+            val = val * (1 + r) + monthly_contribution
+            values.append(val)
+        chart_df = pd.DataFrame({"Month": list(range(1, months + 1)), "Portfolio Value": values})
+        fig = px.line(chart_df, x="Month", y="Portfolio Value", title="Portfolio Growth Over Time")
+        st.plotly_chart(fig, use_container_width=True)
+    
+    st.markdown("---")
+    st.markdown("#### 🎯 Simulate With Custom Stock Portfolio")
+    # Get available stocks (from recommendations or data_fetcher)
+    available_stocks = []
+    if st.session_state.recommendations and 'stocks' in st.session_state.recommendations:
+        available_stocks = [s['symbol'] for s in st.session_state.recommendations['stocks']]
+    else:
+        # fallback: use popular stocks
+        popular = data_fetcher.get_popular_stocks()
+        for stocks in popular.values():
+            available_stocks.extend(stocks)
+        available_stocks = list(set(available_stocks))
+    
+    selected_stocks = st.multiselect(
+        "Select Stocks to Invest In",
+        options=available_stocks,
+        default=available_stocks[:3] if len(available_stocks) >= 3 else available_stocks
+    )
+    
+    if selected_stocks:
+        st.markdown("##### Set Allocation (%) for Each Stock (must sum to 100%)")
+        allocations = {}
+        total_alloc = 0
+        for symbol in selected_stocks:
+            alloc = st.number_input(f"{symbol} Allocation (%)", min_value=0, max_value=100, value=int(100/len(selected_stocks)), key=f"alloc_{symbol}")
+            allocations[symbol] = alloc
+            total_alloc += alloc
+        if total_alloc != 100:
+            st.warning(f"Total allocation is {total_alloc}%. Please ensure allocations sum to 100%.")
+        else:
+            # Get historical annual returns for each stock
+            returns = []
+            for symbol in selected_stocks:
+                try:
+                    data = data_fetcher.get_stock_data(symbol, period="5y")
+                    if not data.empty:
+                        start = data['Close'].iloc[0]
+                        end = data['Close'].iloc[-1]
+                        years = (data.index[-1] - data.index[0]).days / 365.25
+                        ann_return = ((end / start) ** (1/years)) - 1 if years > 0 else default_annual_return
+                    else:
+                        ann_return = default_annual_return
+                except:
+                    ann_return = default_annual_return
+                returns.append(ann_return * allocations[symbol] / 100)
+            weighted_annual_return = sum(returns)
+            st.info(f"Weighted Expected Annual Return: {weighted_annual_return*100:.2f}%")
+            # Recalculate projection
+            months = horizon_years * 12
+            r = weighted_annual_return / 12
+            future_value = initial_investment * (1 + r) ** months + monthly_contribution * (((1 + r) ** months - 1) / r)
+            total_invested = initial_investment + monthly_contribution * months
+            total_gain = future_value - total_invested
+            avg_monthly_return = total_gain / months if months > 0 else 0
+            st.markdown(f"#### 📈 Projected Portfolio Value: **${future_value:,.2f}**")
+            st.markdown(f"#### 💰 Expected Average Monthly Return: **${avg_monthly_return:,.2f}**")
+            # Show growth chart
+            values = []
+            val = initial_investment
+            for m in range(1, months + 1):
+                val = val * (1 + r) + monthly_contribution
+                values.append(val)
+            chart_df = pd.DataFrame({"Month": list(range(1, months + 1)), "Portfolio Value": values})
+            fig = px.line(chart_df, x="Month", y="Portfolio Value", title="Custom Portfolio Growth Over Time")
+            st.plotly_chart(fig, use_container_width=True)
 
 if __name__ == "__main__":
     main()
