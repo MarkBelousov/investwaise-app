@@ -1,370 +1,300 @@
-/* Apple-inspired styling for Streamlit financial app */
+/* Modern Tech-Inspired UI Overhaul */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
-
-/* Root variables for consistent theming */
 :root {
-    --primary-color: #007AFF;
-    --success-color: #34C759;
-    --danger-color: #FF3B30;
-    --warning-color: #FF9500;
-    --info-color: #5AC8FA;
-    --secondary-color: #8E8E93;
-    --background-color: #F2F2F7;
-    --surface-color: #FFFFFF;
-    --text-primary: #000000;
-    --text-secondary: #6D6D80;
-    --border-color: #D1D1D6;
-    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    --radius: 12px;
-    --radius-small: 8px;
+    --accent: #007aff;
+    --accent-gradient: linear-gradient(90deg, #007aff 0%, #00c6fb 100%);
+    --background: #f7f9fa;
+    --surface: rgba(255,255,255,0.85);
+    --surface-blur: blur(12px);
+    --text-main: #1a1a1a;
+    --text-secondary: #6d6d80;
+    --border: #e5e7eb;
+    --shadow: 0 4px 24px rgba(0,0,0,0.07);
+    --radius: 18px;
+    --radius-sm: 10px;
+    --transition: 0.2s cubic-bezier(.4,0,.2,1);
+    --card-glass: rgba(255,255,255,0.7);
+    --card-glass-dark: rgba(30,32,36,0.7);
+    --sidebar-width: 270px;
 }
-
-/* Dark theme variables */
 [data-theme="dark"] {
-    --background-color: #000000;
-    --surface-color: #1C1C1E;
-    --text-primary: #FFFFFF;
-    --text-secondary: #AEAEB2;
-    --border-color: #38383A;
-    --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    --background: #181a1b;
+    --surface: rgba(30,32,36,0.92);
+    --text-main: #f7f9fa;
+    --text-secondary: #b0b3b8;
+    --border: #23272f;
+    --card-glass: rgba(30,32,36,0.7);
 }
 
-/* Global styles */
-.stApp {
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: var(--background-color);
-    color: var(--text-primary);
+body, .stApp {
+    font-family: 'Inter', 'SF Pro Display', 'Segoe UI', Arial, sans-serif;
+    background: var(--background);
+    color: var(--text-main);
+    letter-spacing: -0.01em;
 }
 
-/* Header styling */
+/* Header */
 .header-container {
-    text-align: center;
-    padding: 2rem 0;
-    background: linear-gradient(135deg, var(--primary-color), var(--info-color));
-    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 0 2rem 0;
+    background: var(--surface);
     border-radius: var(--radius);
-    margin-bottom: 2rem;
     box-shadow: var(--shadow);
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
 }
-
+.header-container::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: 50%;
+    width: 400px; height: 180px;
+    background: var(--accent-gradient);
+    filter: blur(60px);
+    opacity: 0.18;
+    transform: translateX(-50%);
+    z-index: 0;
+}
 .main-title {
-    font-size: 3rem;
+    font-size: 2.8rem;
     font-weight: 700;
     margin: 0;
-    letter-spacing: -0.02em;
+    color: var(--accent);
+    letter-spacing: -0.03em;
+    z-index: 1;
 }
-
 .subtitle {
-    font-size: 1.2rem;
-    font-weight: 400;
-    margin: 0.5rem 0 0 0;
-    opacity: 0.9;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    z-index: 1;
 }
 
-/* Card styling */
-.metric-card, .feature-card, .risk-card {
-    background: var(--surface-color);
-    border-radius: var(--radius);
-    padding: 1.5rem;
+/* Sidebar */
+.stSidebar, .css-1d391kg {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    min-width: var(--sidebar-width);
     box-shadow: var(--shadow);
-    border: 1px solid var(--border-color);
-    margin-bottom: 1rem;
-    transition: all 0.3s ease;
+    padding-top: 2rem;
+}
+.stSidebar .stMarkdown, .stSidebar .stSelectbox, .stSidebar .stNumberInput, .stSidebar .stMultiSelect {
+    margin-bottom: 1.5rem;
+}
+.stSidebar .stButton > button {
+    width: 100%;
 }
 
-.metric-card:hover, .feature-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+/* Cards & Glassmorphism */
+.metric-card, .feature-card, .risk-card, .stPlotlyChart, .stTabs [data-baseweb="tab"] {
+    background: var(--card-glass);
+    backdrop-filter: var(--surface-blur);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: box-shadow var(--transition), transform var(--transition);
+}
+.metric-card:hover, .feature-card:hover, .risk-card:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.10);
 }
 
 .metric-card h3 {
-    font-size: 2rem;
-    font-weight: 600;
+    font-size: 2.1rem;
+    font-weight: 700;
     margin: 0;
+    color: var(--accent);
 }
-
 .metric-card h4 {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 1.1rem;
+    font-weight: 600;
     color: var(--text-secondary);
-    margin: 0 0 0.5rem 0;
+    margin-bottom: 0.5rem;
 }
-
 .metric-card p {
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 500;
     margin: 0.5rem 0 0 0;
 }
 
-/* Feature cards */
-.feature-card h4 {
-    color: var(--primary-color);
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-.feature-card p {
-    color: var(--text-secondary);
-    line-height: 1.5;
-    margin: 0;
-}
-
-/* Risk assessment card */
-.risk-card h4 {
-    color: var(--text-primary);
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-.risk-bar {
-    width: 100%;
-    height: 8px;
-    background-color: var(--border-color);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-top: 0.5rem;
-}
-
-.risk-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--success-color), var(--warning-color), var(--danger-color));
-    border-radius: 4px;
-    transition: width 0.5s ease;
-}
-
-/* Streamlit component overrides */
-.stSelectbox > div > div {
-    border-radius: var(--radius-small);
-    border: 1px solid var(--border-color);
-    background-color: var(--surface-color);
-}
-
-.stNumberInput > div > div > input {
-    border-radius: var(--radius-small);
-    border: 1px solid var(--border-color);
-    background-color: var(--surface-color);
-    color: var(--text-primary);
-}
-
+/* Buttons */
 .stButton > button {
-    background: linear-gradient(135deg, var(--primary-color), var(--info-color));
-    color: white;
+    background: var(--accent-gradient);
+    color: #fff;
     border: none;
-    border-radius: var(--radius-small);
+    border-radius: var(--radius-sm);
     font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow);
+    font-size: 1.1rem;
+    padding: 0.7rem 2.2rem;
+    box-shadow: 0 2px 8px rgba(0,122,255,0.08);
+    transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
 }
-
 .stButton > button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+    background: linear-gradient(90deg, #0051a8 0%, #00a6d6 100%);
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 6px 18px rgba(0,122,255,0.13);
+}
+.stButton > button:active {
+    background: #007aff;
+    transform: scale(0.98);
 }
 
-/* Sidebar styling */
-.css-1d391kg {
-    background-color: var(--surface-color);
-    border-right: 1px solid var(--border-color);
-}
-
-.css-1d391kg .stSelectbox > div > div,
-.css-1d391kg .stNumberInput > div > div > input,
-.css-1d391kg .stMultiSelect > div > div {
-    background-color: var(--background-color);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-small);
-}
-
-/* Metric styling */
-.css-1kyxreq {
-    background: var(--surface-color);
-    border-radius: var(--radius);
-    padding: 1rem;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border-color);
-}
-
-/* Tab styling */
+/* Tabs */
 .stTabs [data-baseweb="tab-list"] {
-    gap: 8px;
+    gap: 10px;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 1.5rem;
 }
-
 .stTabs [data-baseweb="tab"] {
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-small);
+    background: transparent;
+    border: none;
+    border-radius: 999px 999px 0 0;
     color: var(--text-secondary);
-    font-weight: 500;
-    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0.7rem 2rem 0.7rem 2rem;
+    transition: color var(--transition), background var(--transition);
 }
-
 .stTabs [aria-selected="true"] {
-    background: linear-gradient(135deg, var(--primary-color), var(--info-color));
-    color: white;
-    border-color: var(--primary-color);
+    background: var(--card-glass);
+    color: var(--accent);
+    border-bottom: 3px solid var(--accent);
 }
 
-/* Charts container */
-.stPlotlyChart {
-    background-color: var(--surface-color);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 1rem;
-    margin: 1rem 0;
+/* Inputs */
+.stSelectbox > div > div, .stNumberInput > div > div > input, .stMultiSelect > div > div {
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-main);
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    transition: border var(--transition), box-shadow var(--transition);
+}
+.stSelectbox > div > div:focus-within, .stNumberInput > div > div > input:focus, .stMultiSelect > div > div:focus-within {
+    border: 1.5px solid var(--accent);
+    box-shadow: 0 0 0 2px #007aff22;
 }
 
-/* Loading spinner */
-.stSpinner {
-    color: var(--primary-color);
-}
-
-/* Success/Error messages */
-.stSuccess {
-    background-color: rgba(52, 199, 89, 0.1);
-    border: 1px solid var(--success-color);
-    color: var(--success-color);
-    border-radius: var(--radius-small);
-}
-
-.stError {
-    background-color: rgba(255, 59, 48, 0.1);
-    border: 1px solid var(--danger-color);
-    color: var(--danger-color);
-    border-radius: var(--radius-small);
-}
-
-.stWarning {
-    background-color: rgba(255, 149, 0, 0.1);
-    border: 1px solid var(--warning-color);
-    color: var(--warning-color);
-    border-radius: var(--radius-small);
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
+/* Responsive */
+@media (max-width: 900px) {
+    .header-container {
+        padding: 2rem 0 1.2rem 0;
+    }
     .main-title {
         font-size: 2rem;
     }
-    
-    .subtitle {
-        font-size: 1rem;
+    .sidebar {
+        min-width: 60px;
     }
-    
+}
+@media (max-width: 600px) {
+    .header-container {
+        padding: 1.2rem 0 0.7rem 0;
+    }
+    .main-title {
+        font-size: 1.3rem;
+    }
     .metric-card, .feature-card, .risk-card {
         padding: 1rem;
     }
-    
-    .header-container {
-        padding: 1.5rem 0;
-        margin-bottom: 1rem;
-    }
 }
 
-/* Custom scrollbar */
+/* Animations */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+    animation: fadeInUp 0.5s cubic-bezier(.4,0,.2,1);
+}
+
+/* Misc */
 ::-webkit-scrollbar {
     width: 8px;
 }
-
-::-webkit-scrollbar-track {
-    background: var(--background-color);
-}
-
 ::-webkit-scrollbar-thumb {
-    background: var(--secondary-color);
+    background: var(--border);
     border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-color);
-}
-
-/* Animation classes */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-in {
-    animation: fadeIn 0.5s ease-out;
+    background: var(--accent);
 }
 
 /* Investment goal tags */
-.investment-goals {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-}
-
 .goal-tag {
-    background: linear-gradient(135deg, var(--primary-color), var(--info-color));
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
+    background: var(--accent-gradient);
+    color: #fff;
+    padding: 0.3rem 1.1rem;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+    box-shadow: 0 2px 8px rgba(0,122,255,0.08);
 }
 
-/* Custom data display */
 .data-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--border-color);
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--border);
 }
-
 .data-row:last-child {
     border-bottom: none;
 }
-
 .data-label {
     font-weight: 500;
     color: var(--text-secondary);
 }
-
 .data-value {
-    font-weight: 600;
-    color: var(--text-primary);
+    font-weight: 700;
+    color: var(--accent);
 }
 
-.positive-value {
-    color: var(--success-color);
-}
+.positive-value { color: #34c759; }
+.negative-value { color: #ff3b30; }
 
-.negative-value {
-    color: var(--danger-color);
-}
-
-/* Recommendation strength indicators */
 .recommendation-badge {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    padding: 0.3rem 1.1rem;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 700;
     text-transform: uppercase;
+    background: var(--surface);
+    color: var(--accent);
+    border: 1.5px solid var(--accent);
+    box-shadow: 0 2px 8px rgba(0,122,255,0.08);
 }
+.strong-buy { background: #e6f9f0; color: #34c759; border-color: #34c759; }
+.buy { background: #e6f4ff; color: #007aff; border-color: #007aff; }
+.hold { background: #f3f3f3; color: #8e8e93; border-color: #8e8e93; }
+.avoid { background: #fff0f0; color: #ff3b30; border-color: #ff3b30; }
 
-.strong-buy {
-    background-color: rgba(52, 199, 89, 0.2);
-    color: var(--success-color);
-    border: 1px solid var(--success-color);
+.stSuccess {
+    background: #e6f9f0;
+    color: #34c759;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid #34c759;
 }
-
-.buy {
-    background-color: rgba(52, 199, 89, 0.1);
-    color: var(--success-color);
+.stError {
+    background: #fff0f0;
+    color: #ff3b30;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid #ff3b30;
 }
-
-.hold {
-    background-color: rgba(142, 142, 147, 0.1);
-    color: var(--secondary-color);
-}
-
-.avoid {
-    background-color: rgba(255, 59, 48, 0.1);
-    color: var(--danger-color);
+.stWarning {
+    background: #fff7e6;
+    color: #ff9500;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid #ff9500;
 }
