@@ -981,52 +981,67 @@ def create_goal_based_portfolio(user_inputs, stocks):
 def display_return_simulator():
     """Display the return simulator for monthly return expectations and custom stock selection"""
     st.markdown("### 💵 Return Simulator")
-    
-    # User input for simulation
-    with st.form("return_sim_form"):
-        initial_investment = st.number_input(
-            "Initial Investment ($)",
-            min_value=0,
-            max_value=1_000_000,
-            value=st.session_state.user_inputs.get('initial_investment', 5000),
-            step=100
-        )
-        monthly_contribution = st.number_input(
-            "Monthly Contribution ($)",
-            min_value=0,
-            max_value=50_000,
-            value=st.session_state.user_inputs.get('monthly_investment', 1000),
-            step=50
-        )
-        horizon_years = st.slider(
-            "Investment Horizon (years)",
-            min_value=1,
-            max_value=30,
-            value=5
-        )
-        default_annual_return = 0.07  # 7% typical market return
-        expected_annual_return = st.number_input(
-            "Expected Annual Return (%)",
-            min_value=0.0,
-            max_value=20.0,
-            value=7.0,
-            step=0.1,
-            help="Estimate based on market or your selected stocks"
-        )
-        submitted = st.form_submit_button("Simulate")
-    
-    if submitted:
+
+    # If recommendations exist, use them and user's initial data automatically
+    if st.session_state.recommendations and 'stocks' in st.session_state.recommendations and st.session_state.user_inputs:
+        user_inputs = st.session_state.user_inputs
+        recommended_stocks = st.session_state.recommendations['stocks']
+        allocations = st.session_state.recommendations.get('allocations', None)
+        default_annual_return = 0.07  # fallback
+
+        # Use user input values
+        initial_investment = user_inputs.get('initial_investment', 5000)
+        monthly_contribution = user_inputs.get('monthly_investment', 1000)
+        # Parse years from investment_horizon string
+        horizon_map = {
+            '6 months': 0.5,
+            '1 year': 1,
+            '2 years': 2,
+            '5 years': 5,
+            '10 years': 10,
+            '20+ years': 25
+        }
+        horizon_years = horizon_map.get(user_inputs.get('investment_horizon', '5 years'), 5)
+
+        # Prepare stock symbols and allocations
+        stock_symbols = [s['symbol'] for s in recommended_stocks[:5]]
+        if allocations:
+            # Normalize allocations to sum to 1
+            total_alloc = sum(allocations.get(sym, 0) for sym in stock_symbols)
+            allocs = {sym: allocations.get(sym, 0)/total_alloc if total_alloc else 1/len(stock_symbols) for sym in stock_symbols}
+        else:
+            allocs = {sym: 1/len(stock_symbols) for sym in stock_symbols}
+
+        # Calculate weighted expected annual return
+        returns = []
+        for sym in stock_symbols:
+            try:
+                data = data_fetcher.get_stock_data(sym, period="5y")
+                if not data.empty:
+                    start = data['Close'].iloc[0]
+                    end = data['Close'].iloc[-1]
+                    years = (data.index[-1] - data.index[0]).days / 365.25
+                    ann_return = ((end / start) ** (1/years)) - 1 if years > 0 else default_annual_return
+                else:
+                    ann_return = default_annual_return
+            except:
+                ann_return = default_annual_return
+            returns.append(ann_return * allocs[sym])
+        weighted_annual_return = sum(returns)
+
+        st.info(f"Weighted Expected Annual Return (from recommendations): {weighted_annual_return*100:.2f}%")
+
         # Calculate projection
-        months = horizon_years * 12
-        r = (expected_annual_return / 100) / 12
-        future_value = initial_investment * (1 + r) ** months + monthly_contribution * (((1 + r) ** months - 1) / r)
+        months = int(horizon_years * 12)
+        r = weighted_annual_return / 12
+        future_value = initial_investment * (1 + r) ** months + monthly_contribution * (((1 + r) ** months - 1) / r) if r != 0 else initial_investment + monthly_contribution * months
         total_invested = initial_investment + monthly_contribution * months
         total_gain = future_value - total_invested
         avg_monthly_return = total_gain / months if months > 0 else 0
-        
+
         st.markdown(f"#### 📈 Projected Portfolio Value: **${future_value:,.2f}**")
         st.markdown(f"#### 💰 Expected Average Monthly Return: **${avg_monthly_return:,.2f}**")
-        
+
         # Show growth chart
         values = []
         val = initial_investment
@@ -1034,9 +1049,69 @@ def display_return_simulator():
             val = val * (1 + r) + monthly_contribution
             values.append(val)
         chart_df = pd.DataFrame({"Month": list(range(1, months + 1)), "Portfolio Value": values})
-        fig = px.line(chart_df, x="Month", y="Portfolio Value", title="Portfolio Growth Over Time")
+        fig = px.line(chart_df, x="Month", y="Portfolio Value", title="Portfolio Growth Over Time (Recommended Portfolio)")
         st.plotly_chart(fig, use_container_width=True)
-    
+
+        st.markdown("---")
+        st.markdown("#### 🎯 Simulate With Custom Stock Portfolio")
+        # (Keep the custom portfolio section as fallback/optional)
+    else:
+        # User input for simulation (manual form)
+        with st.form("return_sim_form"):
+            initial_investment = st.number_input(
+                "Initial Investment ($)",
+                min_value=0,
+                max_value=1_000_000,
+                value=st.session_state.user_inputs.get('initial_investment', 5000),
+                step=100
+            )
+            monthly_contribution = st.number_input(
+                "Monthly Contribution ($)",
+                min_value=0,
+                max_value=50_000,
+                value=st.session_state.user_inputs.get('monthly_investment', 1000),
+                step=50
+            )
+            horizon_years = st.slider(
+                "Investment Horizon (years)",
+                min_value=1,
+                max_value=30,
+                value=5
+            )
+            default_annual_return = 0.07  # 7% typical market return
+            expected_annual_return = st.number_input(
+                "Expected Annual Return (%)",
+                min_value=0.0,
+                max_value=20.0,
+                value=7.0,
+                step=0.1,
+                help="Estimate based on market or your selected stocks"
+            )
+            submitted = st.form_submit_button("Simulate")
+
+        if submitted:
+            # Calculate projection
+            months = horizon_years * 12
+            r = (expected_annual_return / 100) / 12
+            future_value = initial_investment * (1 + r) ** months + monthly_contribution * (((1 + r) ** months - 1) / r) if r != 0 else initial_investment + monthly_contribution * months
+            total_invested = initial_investment + monthly_contribution * months
+            total_gain = future_value - total_invested
+            avg_monthly_return = total_gain / months if months > 0 else 0
+
+            st.markdown(f"#### 📈 Projected Portfolio Value: **${future_value:,.2f}**")
+            st.markdown(f"#### 💰 Expected Average Monthly Return: **${avg_monthly_return:,.2f}**")
+
+            # Show growth chart
+            values = []
+            val = initial_investment
+            for m in range(1, months + 1):
+                val = val * (1 + r) + monthly_contribution
+                values.append(val)
+            chart_df = pd.DataFrame({"Month": list(range(1, months + 1)), "Portfolio Value": values})
+            fig = px.line(chart_df, x="Month", y="Portfolio Value", title="Portfolio Growth Over Time")
+            st.plotly_chart(fig, use_container_width=True)
+
+    # --- Custom Portfolio Section (always available) ---
     st.markdown("---")
     st.markdown("#### 🎯 Simulate With Custom Stock Portfolio")
     # Get available stocks (from recommendations or data_fetcher)
@@ -1049,13 +1124,13 @@ def display_return_simulator():
         for stocks in popular.values():
             available_stocks.extend(stocks)
         available_stocks = list(set(available_stocks))
-    
+
     selected_stocks = st.multiselect(
         "Select Stocks to Invest In",
         options=available_stocks,
         default=available_stocks[:3] if len(available_stocks) >= 3 else available_stocks
     )
-    
+
     if selected_stocks:
         st.markdown("##### Set Allocation (%) for Each Stock (must sum to 100%)")
         allocations = {}
@@ -1085,9 +1160,9 @@ def display_return_simulator():
             weighted_annual_return = sum(returns)
             st.info(f"Weighted Expected Annual Return: {weighted_annual_return*100:.2f}%")
             # Recalculate projection
-            months = horizon_years * 12
+            months = horizon_years * 12 if 'horizon_years' in locals() else 60
             r = weighted_annual_return / 12
-            future_value = initial_investment * (1 + r) ** months + monthly_contribution * (((1 + r) ** months - 1) / r)
+            future_value = initial_investment * (1 + r) ** months + monthly_contribution * (((1 + r) ** months - 1) / r) if r != 0 else initial_investment + monthly_contribution * months
             total_invested = initial_investment + monthly_contribution * months
             total_gain = future_value - total_invested
             avg_monthly_return = total_gain / months if months > 0 else 0
