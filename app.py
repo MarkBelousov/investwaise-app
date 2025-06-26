@@ -16,7 +16,7 @@ from utils.visualizations import Visualizations
 
 # Page configuration
 st.set_page_config(
-    page_title="InvestWise - Smart Investment Advisor",
+    page_title="Bel-Investment",
     page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded"
