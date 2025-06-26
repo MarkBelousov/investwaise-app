@@ -1,0 +1,370 @@
+/* Apple-inspired styling for Streamlit financial app */
+
+@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
+
+/* Root variables for consistent theming */
+:root {
+    --primary-color: #007AFF;
+    --success-color: #34C759;
+    --danger-color: #FF3B30;
+    --warning-color: #FF9500;
+    --info-color: #5AC8FA;
+    --secondary-color: #8E8E93;
+    --background-color: #F2F2F7;
+    --surface-color: #FFFFFF;
+    --text-primary: #000000;
+    --text-secondary: #6D6D80;
+    --border-color: #D1D1D6;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --radius: 12px;
+    --radius-small: 8px;
+}
+
+/* Dark theme variables */
+[data-theme="dark"] {
+    --background-color: #000000;
+    --surface-color: #1C1C1E;
+    --text-primary: #FFFFFF;
+    --text-secondary: #AEAEB2;
+    --border-color: #38383A;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Global styles */
+.stApp {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-primary);
+}
+
+/* Header styling */
+.header-container {
+    text-align: center;
+    padding: 2rem 0;
+    background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+    color: white;
+    border-radius: var(--radius);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.main-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+}
+
+/* Card styling */
+.metric-card, .feature-card, .risk-card {
+    background: var(--surface-color);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover, .feature-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.metric-card h3 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.metric-card h4 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin: 0 0 0.5rem 0;
+}
+
+.metric-card p {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0.5rem 0 0 0;
+}
+
+/* Feature cards */
+.feature-card h4 {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Risk assessment card */
+.risk-card h4 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.risk-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.risk-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success-color), var(--warning-color), var(--danger-color));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+/* Streamlit component overrides */
+.stSelectbox > div > div {
+    border-radius: var(--radius-small);
+    border: 1px solid var(--border-color);
+    background-color: var(--surface-color);
+}
+
+.stNumberInput > div > div > input {
+    border-radius: var(--radius-small);
+    border: 1px solid var(--border-color);
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+}
+
+.stButton > button {
+    background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+    color: white;
+    border: none;
+    border-radius: var(--radius-small);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.stButton > button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+}
+
+/* Sidebar styling */
+.css-1d391kg {
+    background-color: var(--surface-color);
+    border-right: 1px solid var(--border-color);
+}
+
+.css-1d391kg .stSelectbox > div > div,
+.css-1d391kg .stNumberInput > div > div > input,
+.css-1d391kg .stMultiSelect > div > div {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-small);
+}
+
+/* Metric styling */
+.css-1kyxreq {
+    background: var(--surface-color);
+    border-radius: var(--radius);
+    padding: 1rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+/* Tab styling */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-small);
+    color: var(--text-secondary);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+}
+
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Charts container */
+.stPlotlyChart {
+    background-color: var(--surface-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+/* Loading spinner */
+.stSpinner {
+    color: var(--primary-color);
+}
+
+/* Success/Error messages */
+.stSuccess {
+    background-color: rgba(52, 199, 89, 0.1);
+    border: 1px solid var(--success-color);
+    color: var(--success-color);
+    border-radius: var(--radius-small);
+}
+
+.stError {
+    background-color: rgba(255, 59, 48, 0.1);
+    border: 1px solid var(--danger-color);
+    color: var(--danger-color);
+    border-radius: var(--radius-small);
+}
+
+.stWarning {
+    background-color: rgba(255, 149, 0, 0.1);
+    border: 1px solid var(--warning-color);
+    color: var(--warning-color);
+    border-radius: var(--radius-small);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 2rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    .metric-card, .feature-card, .risk-card {
+        padding: 1rem;
+    }
+    
+    .header-container {
+        padding: 1.5rem 0;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+/* Animation classes */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Investment goal tags */
+.investment-goals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.goal-tag {
+    background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Custom data display */
+.data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-row:last-child {
+    border-bottom: none;
+}
+
+.data-label {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.data-value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.positive-value {
+    color: var(--success-color);
+}
+
+.negative-value {
+    color: var(--danger-color);
+}
+
+/* Recommendation strength indicators */
+.recommendation-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.strong-buy {
+    background-color: rgba(52, 199, 89, 0.2);
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+}
+
+.buy {
+    background-color: rgba(52, 199, 89, 0.1);
+    color: var(--success-color);
+}
+
+.hold {
+    background-color: rgba(142, 142, 147, 0.1);
+    color: var(--secondary-color);
+}
+
+.avoid {
+    background-color: rgba(255, 59, 48, 0.1);
+    color: var(--danger-color);
+}

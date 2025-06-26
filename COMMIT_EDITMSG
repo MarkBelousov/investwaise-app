@@ -1,0 +1,7 @@
+Improve app stability and accuracy of stock recommendations
+
+Fixes chart rendering issues by adding unique keys and validates stock symbols before fetching data.
+
+Replit-Commit-Author: Agent
+Replit-Commit-Session-Id: 1d7037f9-5d46-4a7c-91ad-cd85f6aa8623
+Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/58036427-5172-4ac3-99cd-992ad6faf413/920d999d-7754-4a04-aea4-8b3c23b0c965.jpg
