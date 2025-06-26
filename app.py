@@ -71,7 +71,7 @@ def main():
         # Investment parameters
         monthly_investment = st.number_input(
             "Monthly Investment Amount ($)",
-            min_value=50,
+            min_value=0,
             max_value=50000,
             value=1000,
             step=50,
